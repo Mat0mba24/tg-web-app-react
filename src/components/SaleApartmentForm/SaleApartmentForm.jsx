@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState } from 'react';
+import { useEffect } from 'react';
 import './SaleApartmentForm.css';
-import { useTelegram } from "../../hooks/useTelegram";
+import { useTelegram } from '../../hooks/useTelegram';
 
 const SaleApartmentForm = () => {
+	const { tg } = useTelegram();
 	const [country, setCountry] = useState('');
 	const [street, setStreet] = useState('');
 	const [subject, setSubject] = useState('physical');
-	const { tg } = useTelegram();
 
 	useEffect(() => {
 		tg.MainButton.setParams({
@@ -15,7 +16,7 @@ const SaleApartmentForm = () => {
 	}, [])
 
 	useEffect(() => {
-		if (!country || !street) {
+		if (!street || !country) {
 			tg.MainButton.hide();
 		} else {
 			tg.MainButton.show();
