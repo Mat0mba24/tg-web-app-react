@@ -1,6 +1,7 @@
 import './App.css';
 import { useEffect } from 'react';
 import { useTelegram } from './hooks/useTelegram';
+import Header from "./components/Header/Header";
 import { Route, Routes } from 'react-router-dom';
 import SaleApartmentForm from "./components/SaleApartmentForm/SaleApartmentForm";
 import RentApartmentForm from "./components/RentApartmentForm/RentApartmentForm";
@@ -14,7 +15,7 @@ function App() {
 
 	return (
 		<div className="App">
-			work
+			<Header />
 			<Routes>
 				<Route path={'sale_apartment_form'} element={<SaleApartmentForm />} />
 				<Route path={'rent_apartment_form'} element={<RentApartmentForm />} />
