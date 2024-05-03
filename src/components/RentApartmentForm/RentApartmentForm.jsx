@@ -3,30 +3,43 @@ import './RentApartmentForm.css';
 import { useTelegram } from '../../hooks/useTelegram';
 
 const RentApartmentForm = () => {
-	const [country, setCountry] = useState('');
-	const [street, setStreet] = useState('');
-	const [subject, setSubject] = useState('physical');
-	const { tg, queryId } = useTelegram();
+	const [address, setAddress] = useState('');
+	const [environment, setEnvironment] = useState([]);
+	const [infrastructure, setInfrastructure] = useState([]);
+	const [typeOfHouse, setTypeOfHouse] = useState(0);
+	const [selectedFiles, setSelectedFiles] = useState([]);
+	const [previewUrls, setPreviewUrls] = useState([]);
+	const { tg, user, queryId } = useTelegram();
 
 	const onSendData = useCallback(() => {
-		const data = {
-			country,
-			street,
-			subject,
-			queryId
-		}
-		fetch('http://localhost:8000/form_data', {
+		// Создаем новый объект FormData
+		const formData = new FormData();
+
+		// Добавляем данные формы
+		formData.append('address', address);
+		formData.append('environment', JSON.stringify(environment));
+		formData.append('infrastructure', JSON.stringify(infrastructure));
+		formData.append('typeOfHouse', typeOfHouse);
+		// Добавляем userId
+		formData.append('userId', user.id);
+		// Добавляем queryId
+		formData.append('queryId', queryId);
+		// Добавляем фотографии
+		selectedFiles.forEach(file => {
+			formData.append('photos', file);
+		});
+
+		// Отправляем запрос на сервер
+		fetch('https://mat0m6a.ru/form_data', {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(data)
+			body: formData // Теперь отправляем formData вместо JSON
 		})
-	}, [country, street, subject])
+	}, [address, environment, infrastructure, typeOfHouse, selectedFiles, queryId]);
 
 	useEffect(() => {
 		tg.onEvent('mainButtonClicked', onSendData)
 		return () => {
+			previewUrls.forEach(URL.revokeObjectURL);
 			tg.offEvent('mainButtonClicked', onSendData)
 		}
 	}, [onSendData])
@@ -38,46 +51,115 @@ const RentApartmentForm = () => {
 	}, [])
 
 	useEffect(() => {
-		if (!street || !country) {
+		if (!address || !environment || !infrastructure || selectedFiles.length == 0) {
 			tg.MainButton.hide();
 		} else {
 			tg.MainButton.show();
 		}
-	}, [country, street])
+	}, [address, environment, infrastructure, selectedFiles])
 
-	const onChangeCountry = (e) => {
-		setCountry(e.target.value);
+	const onChangeAddress = (e) => {
+		setAddress(e.target.value);
 	}
 
-	const onChangeStreet = (e) => {
-		setStreet(e.target.value);
+	const onChangeEnvironment = (e) => {
+		setEnvironment(Array.from(e.target.selectedOptions, option => option.value));
 	}
 
-	const onChangeSubject = (e) => {
-		setSubject(e.target.value);
+	const onChangeInfrastructure = (e) => {
+		setInfrastructure(Array.from(e.target.selectedOptions, option => option.value));
 	}
+
+	const onChangeTypeOfHouse = (e) => {
+		setTypeOfHouse(e.target.value);
+	}
+
+	// Обработчик изменений input
+	const onFilesChange = (event) => {
+		// Если количество файлов вместе с уже выбранными не превышает 10
+		if (event.target.files.length + selectedFiles.length <= 10) {
+			// Создаем массив файлов из FileList
+			const filesArray = Array.from(event.target.files);
+			// Обновляем состояние добавлением новых файлов
+			setSelectedFiles(prevFiles => [...prevFiles, ...filesArray]);
+			// Создаем превью URL для каждого нового файла
+			const newPreviewUrls = filesArray.map(file => URL.createObjectURL(file));
+			// Обновляем состояние превью URL
+			setPreviewUrls(prevUrls => [...prevUrls, ...newPreviewUrls]);
+		} else {
+			alert('Вы можете загрузить не более 10 фотографий.');
+		}
+	};
+
+	// Обработчик удаления файла и его превью из списка
+	const removeFile = (index) => {
+		// Освобождаем URL превью
+		URL.revokeObjectURL(previewUrls[index]);
+		// Удаляем файл и URL превью из состояния
+		setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+		setPreviewUrls(prevUrls => prevUrls.filter((_, i) => i !== index));
+	};
+
+	const environmentObjects = [
+		{ environment_id: 0, environment_name: 'Лес' },
+		{ environment_id: 1, environment_name: 'Парк' },
+		{ environment_id: 2, environment_name: 'Водоём' }
+	];
+
+	const infrastructureObjects = [
+		{ infrastructure_id: 0, infrastructure_name: 'Дет. сад' },
+		{ infrastructure_id: 1, infrastructure_name: 'Школа' },
+		{ infrastructure_id: 2, infrastructure_name: 'Больница' },
+		{ infrastructure_id: 3, infrastructure_name: 'Транспортная доступность' },
+		{ infrastructure_id: 4, infrastructure_name: 'Торговые центры' }
+	];
+
+	const typesOfHouseObjects = [
+		{ type_id: 0, type_name: 'Панельный' },
+		{ type_id: 1, type_name: 'Кирпичный' },
+		{ type_id: 2, type_name: 'Монолитный' }
+	];
 
 	return (
 		<div className={"form"}>
-			<h3>Введите ваши данные для СДАЧИ квартиры в аренду:</h3>
+			<h1><u>ЛИСТ ОСМОТРА КВАРТИРЫ</u></h1>
 			<input
 				className={"input"}
 				type="text"
-				placeholder={'Страна'}
-				value={country}
-				onChange={onChangeCountry}
+				placeholder={'Адрес'}
+				value={address}
+				onChange={onChangeAddress}
 			/>
-			<input
-				className={"input"}
-				type="text"
-				placeholder={'Улица'}
-				value={street}
-				onChange={onChangeStreet}
-			/>
-			<select value={subject} onChange={onChangeSubject} className={"select"}>
-				<option value={"legal"}>Юр. лицо</option>
-				<option value={"physical"}>Физ. лицо</option>
+			<h2><u>Характеристика района:</u></h2>
+			<select multiple value={environment} onChange={onChangeEnvironment} className={"select"}>
+				{environmentObjects.map((env) => (
+					<option value={env.environment_id}>{env.environment_name}</option>
+				))}
 			</select>
+			<select multiple value={infrastructure} onChange={onChangeInfrastructure} className={"select"}>
+				{infrastructureObjects.map((inf) => (
+					<option value={inf.infrastructure_id}>{inf.infrastructure_name}</option>
+				))}
+			</select>
+			<h2><u>Характеристики объекта:</u></h2>
+			<select value={typeOfHouse} onChange={onChangeTypeOfHouse} className={"select"}>
+				{typesOfHouseObjects.map((type) => (
+					<option value={type.type_id}>{type.type_name}</option>
+				))}
+			</select>
+			<h2><u>Изображения:</u></h2>
+			<input
+				type="file"
+				multiple
+				onChange={onFilesChange}
+			/>
+			{selectedFiles.map((file, index) => (
+				<div key={index}>
+					<img src={previewUrls[index]} alt="Preview" style={{ width: '100px', height: '100px' }} />
+					<span>{file.name}</span>
+					<button type="button" onClick={() => removeFile(index)}>Удалить</button>
+				</div>
+			))}
 		</div>
 	);
 };
