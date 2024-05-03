@@ -6,15 +6,22 @@ const RentApartmentForm = () => {
 	const [country, setCountry] = useState('');
 	const [street, setStreet] = useState('');
 	const [subject, setSubject] = useState('physical');
-	const { tg } = useTelegram();
+	const { tg, queryId } = useTelegram();
 
 	const onSendData = useCallback(() => {
 		const data = {
 			country,
 			street,
-			subject
+			subject,
+			queryId
 		}
-		tg.sendData(JSON.stringify(data));
+		fetch('http://localhost:8000/form_data', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(data)
+		})
 	}, [country, street, subject])
 
 	useEffect(() => {
