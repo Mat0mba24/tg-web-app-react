@@ -3,8 +3,7 @@ import { useEffect } from 'react';
 import { useTelegram } from './hooks/useTelegram';
 import Header from "./components/Header/Header";
 import { Route, Routes } from 'react-router-dom';
-import SaleApartmentForm from "./components/SaleApartmentForm/SaleApartmentForm";
-import RentApartmentForm from "./components/RentApartmentForm/RentApartmentForm";
+import ApartmentForm from "./components/ApartmentForm/ApartmentForm";
 
 function App() {
 	const { tg } = useTelegram();
@@ -17,8 +16,7 @@ function App() {
 		<div className="App">
 			<Header />
 			<Routes>
-				<Route path={'sale_apartment_form'} element={<SaleApartmentForm />} />
-				<Route path={'rent_apartment_form'} element={<RentApartmentForm />} />
+				<Route path={'apartment_form'} element={<ApartmentForm />} />
 			</Routes>
 		</div>
 	);

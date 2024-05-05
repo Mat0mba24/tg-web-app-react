@@ -1,0 +1,23 @@
+.form {
+	display: flex;
+	flex-direction: column;
+	padding: 20px;
+}
+h1, h2 {
+	text-align: center;
+	margin-bottom: 10px;
+}
+.squares {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid #ccc;
+	padding: 5px;
+	border-radius: 5px;
+	column-gap: 5px;
+}
+.squares__item {
+	display: flex;
+	flex-direction: column;
+}
+
+

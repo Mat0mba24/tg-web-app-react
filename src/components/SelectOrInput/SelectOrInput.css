@@ -1,0 +1,16 @@
+.container {
+	margin-bottom: 20px;
+}
+.select_or_input {
+	display: flex;
+	border: 1px solid #ccc;
+	padding: 5px;
+	border-radius: 5px;
+	column-gap: 5px;
+}
+.select_or_input select {
+	flex: 1 1 auto;
+}
+.select_or_input input {
+	flex: 1 1 auto;
+}
