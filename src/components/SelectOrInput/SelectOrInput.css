@@ -4,8 +4,6 @@
 .select_or_input {
 	display: flex;
 	flex-direction: column;
-	border: 1px solid #ccc;
-	padding: 5px;
 	border-radius: 5px;
 	row-gap: 5px;
 }
@@ -19,6 +17,11 @@
 	font-size: 15px;
 	max-width: 100%;
 }
+.select_or_input textarea,
+input[type="number"] {
+	padding-left: 4px;
+}
 .parameter_name {
 	font-size: 20px;
+	margin-bottom: 5px;
 }

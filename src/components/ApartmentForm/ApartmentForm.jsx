@@ -474,8 +474,8 @@ const ApartmentForm = () => {
 					<input type="file" multiple onChange={onFilesChange} />
 					{selectedFiles.map((fileObj) => (
 						<div className="image-block" key={fileObj.id}>
-								<img src={fileObj.previewUrl} alt="Preview" />
 								<span>{fileObj.file.name}</span>
+								<img src={fileObj.previewUrl} alt="Preview" />
 								<button type="button" onClick={() => removeFile(fileObj.id)}>Удалить</button>
 						</div>
 					))}
