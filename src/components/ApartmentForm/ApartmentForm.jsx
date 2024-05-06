@@ -12,41 +12,39 @@ const ApartmentForm = () => {
 		environmentText: '',
 		infrastructure: [],
 		infrastructureText: '',
-		typeOfHouse: '',
+		typeOfHouse: [],
 		typeOfHouseText: '',
-		classOfHouse: '',
+		classOfHouse: [],
 		classOfHouseText: '',
 		yearBuilt: '',
-		entranceCondition: '',
+		entranceCondition: [],
 		entranceConditionText: '',
 		floorsCount: '',
 		floorNumber: '',
 		roomsCount: '',
-		apartmentCondition: '',
-		repair: '',
+		apartmentCondition: [],
+		repair: [],
 		repairText: '',
 		squareTotal: '',
 		squareLiving: '',
 		squareKitchen: '',
-		layout: '',
+		layout: [],
 		layoutText: '',
-		bathroom: '',
+		bathroom: [],
 		bathroomСount: '',
-		kitchen: '',
+		kitchen: [],
 		kitchenText: '',
-		glassPane: '',
+		glassPane: [],
 		glassPaneText: '',
-		furniture: '',
+		furniture: [],
 		furnitureText: '',
-		redevelopment: '',
+		redevelopment: [],
 		redevelopmentText: '',
 		nuances: '',
 		notes: '',
-		mortgage: '',
-		hasBalcony: '',
-		typeOfSale: '',
-		selectedFiles: [],
-		previewUrls: [],
+		mortgage: [],
+		hasBalcony: [],
+		typeOfSale: []
 	};
 	
 	const [state, setState] = useState(initialState);
@@ -81,7 +79,7 @@ const ApartmentForm = () => {
 			method: 'POST',
 			body: formData // Теперь отправляем formData вместо JSON
 		})
-	}, [state, selectedFiles, queryId]);
+	}, [user, state, selectedFiles, queryId]);
 	
 	useEffect(() => {
 		tg.onEvent('mainButtonClicked', onSendData)
@@ -89,39 +87,43 @@ const ApartmentForm = () => {
 			previewUrls.forEach(URL.revokeObjectURL);
 			tg.offEvent('mainButtonClicked', onSendData)
 		}
-	}, [onSendData])
+	}, [tg, onSendData, previewUrls])
 
 	useEffect(() => {
 		tg.MainButton.setParams({
 			text: 'Отправить данные'
 		})
-	}, [])
-
-	const areAllFieldsFilled = () => {
-		return Object.values(state).every(value => {
-			if (Array.isArray(value)) {
-				// Если значение является массивом, проверяем, что он не пуст
-				return value.length > 0;
-			} else {
-				// Иначе проверяем, что значение не пустое
-				return value !== '' && value !== 0;
-			}
-		});
-	};
+	}, [tg])
 
 	useEffect(() => {
+		const areAllFieldsFilled = () => {
+			return Object.values(state).every(value => {
+				if (Array.isArray(value)) {
+					// Если значение является массивом, проверяем, что он не пуст
+					return value.length > 0;
+				} else {
+					// Иначе проверяем, что значение не пустое
+					return value !== '' && value !== 0;
+				}
+			});
+		};
 		if (!areAllFieldsFilled()) {
 			tg.MainButton.hide();
 		} else {
 			tg.MainButton.show();
 		}
-	}, [selectedFiles])
+	}, [tg, state])
 
 	const onChange = (e) => {
 		const { name, value, selectedOptions } = e.target;
 		if (selectedOptions) {
-			// Если это <select multiple>, то обрабатываем как массив
-			setState(prevState => ({ ...prevState, [name]: Array.from(selectedOptions, option => option.value) }));
+			// Если выбрано значение '', то не обновляем состояние
+			if (value === '') {
+				setState(prevState => ({ ...prevState, [name]: [] }));
+			}
+			else {
+				setState(prevState => ({ ...prevState, [name]: Array.from(selectedOptions, option => option.value) }));
+			}
 		} else {
 			// Иначе обрабатываем как обычное поле ввода
 			setState(prevState => ({ ...prevState, [name]: value }));
