@@ -3,14 +3,22 @@
 }
 .select_or_input {
 	display: flex;
+	flex-direction: column;
 	border: 1px solid #ccc;
 	padding: 5px;
 	border-radius: 5px;
-	column-gap: 5px;
+	row-gap: 5px;
 }
 .select_or_input select {
-	flex: 1 1 auto;
+	font-size: 15px;
 }
 .select_or_input input {
-	flex: 1 1 auto;
+	font-size: 15px;
+}
+.select_or_input textarea {
+	font-size: 15px;
+	max-width: 100%;
+}
+.parameter_name {
+	font-size: 20px;
 }

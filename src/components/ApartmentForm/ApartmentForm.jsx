@@ -49,45 +49,44 @@ const ApartmentForm = () => {
 	
 	const [state, setState] = useState(initialState);
 	const [selectedFiles, setSelectedFiles] = useState([]);
-	const [previewUrls, setPreviewUrls] = useState([]);
 	const { tg, user, queryId } = useTelegram();
 
 	const onSendData = useCallback(() => {
-		// Создаем новый объект FormData
-		const formData = new FormData();
-	
-		// Добавляем данные формы
-		Object.entries(state).forEach(([key, value]) => {
-			if (Array.isArray(value)) {
-				formData.append(key, JSON.stringify(value));
-			} else {
-				formData.append(key, value);
-			}
-		});
-	
-		// Добавляем userId
-		formData.append('userId', user.id);
-		// Добавляем queryId
-		formData.append('queryId', queryId);
-		// Добавляем фотографии
-		selectedFiles.forEach(file => {
-			formData.append('photos', file);
-		});
-	
-		// Отправляем запрос на сервер
-		fetch('https://mat0m6a.ru/form_data', {
-			method: 'POST',
-			body: formData // Теперь отправляем formData вместо JSON
-		})
+    // Создаем новый объект FormData
+    const formData = new FormData();
+
+    // Добавляем данные формы
+    Object.entries(state).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+            formData.append(key, JSON.stringify(value));
+        } else {
+            formData.append(key, value);
+        }
+    });
+
+    // Добавляем userId
+    formData.append('userId', user.id);
+    // Добавляем queryId
+    formData.append('queryId', queryId);
+    // Добавляем фотографии
+    selectedFiles.forEach(fileObj => {
+        formData.append('photos', fileObj.file); // Теперь отправляем только файл
+    });
+
+    // Отправляем запрос на сервер
+    fetch('https://mat0m6a.ru/form_data', {
+        method: 'POST',
+        body: formData // Теперь отправляем formData вместо JSON
+    })
 	}, [user, state, selectedFiles, queryId]);
 	
 	useEffect(() => {
-		tg.onEvent('mainButtonClicked', onSendData)
-		return () => {
-			previewUrls.forEach(URL.revokeObjectURL);
-			tg.offEvent('mainButtonClicked', onSendData)
-		}
-	}, [tg, onSendData, previewUrls])
+			tg.onEvent('mainButtonClicked', onSendData)
+			return () => {
+					selectedFiles.forEach(fileObj => URL.revokeObjectURL(fileObj.previewUrl));
+					tg.offEvent('mainButtonClicked', onSendData)
+			}
+	}, [tg, onSendData, selectedFiles]);
 
 	useEffect(() => {
 		tg.MainButton.setParams({
@@ -132,28 +131,39 @@ const ApartmentForm = () => {
 
 	// Обработчик изменений input
 	const onFilesChange = (event) => {
-		// Если количество файлов вместе с уже выбранными не превышает 10
-		if (event.target.files.length + selectedFiles.length <= 10) {
-			// Создаем массив файлов из FileList
-			const filesArray = Array.from(event.target.files);
-			// Обновляем состояние добавлением новых файлов
-			setSelectedFiles(prevFiles => [...prevFiles, ...filesArray]);
-			// Создаем превью URL для каждого нового файла
-			const newPreviewUrls = filesArray.map(file => URL.createObjectURL(file));
-			// Обновляем состояние превью URL
-			setPreviewUrls(prevUrls => [...prevUrls, ...newPreviewUrls]);
-		} else {
-			alert('Вы можете загрузить не более 10 фотографий.');
-		}
+    const files = Array.from(event.target.files);
+    const imageTypes = ['image/png', 'image/jpeg'];
+
+    for (let i = 0; i < files.length; i++) {
+        if (!imageTypes.includes(files[i].type)) {
+            alert('Один из файлов не является изображением. Пожалуйста, загрузите только изображения формата .jpeg или .png.');
+            return;
+        }
+    }
+
+    // Если количество файлов вместе с уже выбранными не превышает 10
+    if (files.length + selectedFiles.length <= 10) {
+        // Создаем массив файлов из FileList
+        const filesArray = files.map(file => ({
+            file,
+            id: Math.random().toString(36).substring(2, 9), // Генерируем уникальный ID
+            previewUrl: URL.createObjectURL(file)
+        }));
+
+        // Обновляем состояние добавлением новых файлов
+        setSelectedFiles(prevFiles => [...prevFiles, ...filesArray]);
+    } else {
+        alert('Вы можете загрузить не более 10 фотографий.');
+    }
 	};
 
 	// Обработчик удаления файла и его превью из списка
-	const removeFile = (index) => {
-		// Освобождаем URL превью
-		URL.revokeObjectURL(previewUrls[index]);
-		// Удаляем файл и URL превью из состояния
-		setSelectedFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
-		setPreviewUrls(prevUrls => prevUrls.filter((_, i) => i !== index));
+	const removeFile = (id) => {
+		setSelectedFiles(prevFiles => {
+				const fileToRemove = prevFiles.find(fileObj => fileObj.id === id);
+				URL.revokeObjectURL(fileToRemove.previewUrl);
+				return prevFiles.filter(fileObj => fileObj.id !== id);
+		});
 	};
 
 	const environmentObjects = [
@@ -310,6 +320,8 @@ const ApartmentForm = () => {
 				parameterName="Год постройки:"
 				name2="yearBuilt" value2={state.yearBuilt}
 				onChangeFunc={onChange}
+				inputType="number"
+				placeholderText="Введите число"
 			/>
 			<SelectOrInput
 				parameterName="Состояние подъезда:"
@@ -323,16 +335,22 @@ const ApartmentForm = () => {
 				parameterName="Этажность дома:"
 				name2="floorsCount" value2={state.floorsCount}
 				onChangeFunc={onChange}
+				inputType="number"
+				placeholderText="Введите число"
 			/>
 			<SelectOrInput
 				parameterName="Этаж:"
 				name2="floorNumber" value2={state.floorNumber}
 				onChangeFunc={onChange}
+				inputType="number"
+				placeholderText="Введите число"
 			/>
 			<SelectOrInput
 				parameterName="Количество комнат:"
 				name2="roomsCount" value2={state.roomsCount}
 				onChangeFunc={onChange}
+				inputType="number"
+				placeholderText="Введите число"
 			/>
 			<SelectOrInput
 				parameterName="Состояние квартиры:"
@@ -354,15 +372,15 @@ const ApartmentForm = () => {
 				<div className="squares">
 					<div className="squares__item">
 						<div>общая:</div>
-						<input name="squareTotal" type="text" value={state.squareTotal} onChange={onChange} placeholder='Введите число'/>
+						<input name="squareTotal" type="number" value={state.squareTotal} onChange={onChange} placeholder='Введите число'/>
 					</div>
 					<div className="squares__item">
 						<div>жилая:</div>
-						<input name="squareLiving" type="text" value={state.squareLiving} onChange={onChange} placeholder='Введите число'/>
+						<input name="squareLiving" type="number" value={state.squareLiving} onChange={onChange} placeholder='Введите число'/>
 					</div>
 					<div className="squares__item">
 						<div>кухня:</div>
-						<input name="squareKitchen" type="text" value={state.squareKitchen} onChange={onChange} placeholder='Введите число'/>
+						<input name="squareKitchen" type="number" value={state.squareKitchen} onChange={onChange} placeholder='Введите число'/>
 					</div>
 				</div>
 			</div>
@@ -385,6 +403,8 @@ const ApartmentForm = () => {
 				parameterName="Количество санузлов:"
 				name2="bathroomСount" value2={state.bathroomСount}
 				onChangeFunc={onChange}
+				inputType="number"
+				placeholderText="Введите число"
 			/>
 			<SelectOrInput
 				parameterName="На кухне:"
@@ -450,14 +470,16 @@ const ApartmentForm = () => {
 				onChangeFunc={onChange}
 			/>
 			<h2><u>Изображения:</u></h2>
-			<input type="file" multiple onChange={onFilesChange}/>
-			{selectedFiles.map((file, index) => (
-				<div key={index}>
-					<img src={previewUrls[index]} alt="Preview" style={{ width: '100px', height: '100px' }} />
-					<span>{file.name}</span>
-					<button type="button" onClick={() => removeFile(index)}>Удалить</button>
-				</div>
-			))}
+			<div className="images_container">
+					<input type="file" multiple onChange={onFilesChange} />
+					{selectedFiles.map((fileObj) => (
+						<div className="image-block" key={fileObj.id}>
+								<img src={fileObj.previewUrl} alt="Preview" />
+								<span>{fileObj.file.name}</span>
+								<button type="button" onClick={() => removeFile(fileObj.id)}>Удалить</button>
+						</div>
+					))}
+			</div>
 		</div>
 	);
 };

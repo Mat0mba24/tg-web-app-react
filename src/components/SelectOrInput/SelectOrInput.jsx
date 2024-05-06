@@ -16,9 +16,28 @@ const SelectOrInput = (props) => {
 							</select>
 						)
 					}
-					{
-						props.name2 && (
-							<input name={props.name2} value={props.value2} onChange={props.onChangeFunc} type="text" placeholder="Введите текст"/>
+					{ // если указан тип, то он числовой
+						props.name2 && props.inputType && (
+							props.inputType && (
+								<input 
+								name={props.name2} 
+								value={props.value2} 
+								onChange={props.onChangeFunc} 
+								type={props.inputType}
+								placeholder={props.placeholderText}
+							/>
+							)
+						)
+					}
+					{ // если не указан тип, то он текстовый, поэтому создаем textarea
+						props.name2 && !props.inputType && (
+							<textarea 
+								name={props.name2} 
+								onChange={props.onChangeFunc} 
+								placeholder="Введите текст"
+							>
+								{props.value2}
+							</textarea>
 						)
 					}
 				</div>

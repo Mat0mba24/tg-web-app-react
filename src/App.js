@@ -14,7 +14,6 @@ function App() {
 
 	return (
 		<div className="App">
-			<Header />
 			<Routes>
 				<Route path={'apartment_form'} element={<ApartmentForm />} />
 			</Routes>
