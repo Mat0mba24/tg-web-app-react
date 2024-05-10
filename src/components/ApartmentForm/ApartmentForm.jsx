@@ -58,9 +58,11 @@ const ApartmentForm = () => {
     // Добавляем данные формы
     Object.entries(state).forEach(([key, value]) => {
         if (Array.isArray(value)) {
-            formData.append(key, JSON.stringify(value));
+						if (value.length > 0)
+            	formData.append(key, JSON.stringify(value));
         } else {
-            formData.append(key, value);
+						if (value !== '')
+            	formData.append(key, value);
         }
     });
 
@@ -95,18 +97,7 @@ const ApartmentForm = () => {
 	}, [tg])
 
 	useEffect(() => {
-		const areAllFieldsFilled = () => {
-			return Object.values(state).every(value => {
-				if (Array.isArray(value)) {
-					// Если значение является массивом, проверяем, что он не пуст
-					return value.length > 0;
-				} else {
-					// Иначе проверяем, что значение не пустое
-					return value !== '' && value !== 0;
-				}
-			});
-		};
-		if (!areAllFieldsFilled()) {
+		if (!state.address || !state.cost || !state.cadastralNumber) {
 			tg.MainButton.hide();
 		} else {
 			tg.MainButton.show();
