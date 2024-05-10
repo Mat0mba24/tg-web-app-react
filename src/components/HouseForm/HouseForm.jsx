@@ -1,55 +1,48 @@
 import { useState, useEffect, useCallback } from 'react';
-import './ApartmentForm.css';
+import './HouseForm.css';
 import { useTelegram } from '../../hooks/useTelegram';
 import SelectOrInput from '../SelectOrInput/SelectOrInput';
 
-const ApartmentForm = () => {
+const HouseForm = () => {
 	const initialState = {
+		// общее
 		address: '',
 		cost: '',
 		cadastralNumber: '',
+		// район
 		environment: [],
 		environmentText: '',
 		infrastructure: [],
 		infrastructureText: '',
+		// объект
 		typeOfHouse: [],
-		typeOfHouseText: '',
+		wallMaterial: [],
 		classOfHouse: [],
 		classOfHouseText: '',
 		yearBuilt: '',
-		entranceCondition: [],
-		entranceConditionText: '',
 		floorsCount: '',
-		floorNumber: '',
-		roomsCount: '',
-		apartmentCondition: [],
+		houseCondition: [],
 		repair: [],
-		repairText: '',
-		squareTotal: '',
-		squareLiving: '',
-		squareKitchen: '',
-		layout: [],
-		layoutText: '',
-		bathroom: [],
+		squareHouse: '',
+		squareArea: '',
+		landCategory: [],
+		roomsCount: '',
 		bathroomСount: '',
-		kitchen: [],
-		kitchenText: '',
-		glassPane: [],
-		glassPaneText: '',
+		communications: [],
 		furniture: [],
 		furnitureText: '',
-		redevelopment: [],
-		redevelopmentText: '',
+		mkadDistance: '',
 		nuances: '',
-		notes: '',
 		mortgage: [],
-		hasBalcony: [],
-		typeOfSale: []
+		typeOfSale: [],
+		notes: ''
 	};
 	
 	const [state, setState] = useState(initialState);
 	const [selectedFiles, setSelectedFiles] = useState([]);
 	const { tg, user, queryId } = useTelegram();
+
+	console.log(state);
 
 	const onSendData = useCallback(() => {
     // Создаем новый объект FormData
@@ -74,7 +67,7 @@ const ApartmentForm = () => {
     });
 
     // Отправляем запрос на сервер
-    fetch('https://mat0m6a.ru/apartment_form_data', {
+    fetch('https://mat0m6a.ru/house_form_data', {
         method: 'POST',
         body: formData // Теперь отправляем formData вместо JSON
     })
@@ -181,9 +174,21 @@ const ApartmentForm = () => {
 	];
 
 	const typeOfHouseObjects = [
-		{ id: 0, name: 'Панельный' },
-		{ id: 1, name: 'Кирпичный' },
-		{ id: 2, name: 'Монолитный' }
+		{ id: 0, name: 'Дом' },
+		{ id: 1, name: 'Дача' },
+		{ id: 2, name: 'Коттедж' },
+		{ id: 3, name: 'Таунхаус' }
+	];
+
+	const wallMaterialObjects = [
+		{ id: 0, name: 'Кирпич' },
+		{ id: 1, name: 'Брус' },
+		{ id: 2, name: 'Бревно' },
+		{ id: 3, name: 'Газоблоки' },
+		{ id: 4, name: 'Металл' },
+		{ id: 5, name: 'Пеноблоки' },
+		{ id: 6, name: 'Сэндвич-панели' },
+		{ id: 7, name: 'Другое' }
 	];
 
 	const classOfHouseObjects = [
@@ -194,13 +199,7 @@ const ApartmentForm = () => {
 		{ id: 4, name: 'Элитное' }
 	];
 
-	const entranceConditionObjects = [
-		{ id: 0, name: 'Удовл.' },
-		{ id: 1, name: 'Среднее' },
-		{ id: 2, name: 'Хорошее' },
-	];
-
-	const apartmentConditionObjects = [
+	const houseConditionObjects = [
 		{ id: 0, name: 'Удовл.' },
 		{ id: 1, name: 'Среднее' },
 		{ id: 2, name: 'Хорошее' },
@@ -211,47 +210,29 @@ const ApartmentForm = () => {
 		{ id: 1, name: 'Евроремонт' },
 		{ id: 3, name: 'Авторский проект' },
 		{ id: 4, name: 'От застройщика' },
-		{ id: 5, name: 'Требуется' },
+		{ id: 5, name: 'Черновая' },
+		{ id: 6, name: 'Чистовая' }
 	];
 
-	const layoutObjects = [
-		{ id: 0, name: 'Смежная' },
-		{ id: 1, name: 'Раздельная' },
-		{ id: 3, name: 'Распашонка' },
-		{ id: 4, name: 'Студия' }
+	const landCategoryObjects = [
+		{ id: 0, name: 'ИЖС' },
+		{ id: 1, name: 'СНТ' },
+		{ id: 3, name: 'ДНТ' },
+		{ id: 4, name: 'ЛПХ' },
+		{ id: 5, name: 'Фермерское хозяйство' }
 	];
 
-	const bathroomObjects = [
-		{ id: 0, name: 'Совместный' },
-		{ id: 1, name: 'Раздельный' }
-	];
-
-	const kitchenObjects = [
-		{ id: 0, name: 'Газовая колонка' },
-		{ id: 1, name: 'Газовая плита' },
-		{ id: 2, name: 'Электрическая плита' },
-	];
-
-	const hasBalconyObjects = [
-		{ id: 0, name: 'Да' },
-		{ id: 1, name: 'Нет' }
-	];
-
-	const glassPaneObjects = [
-		{ id: 0, name: 'Пластик' },
-		{ id: 1, name: 'Дерево' }
+	const communicationsObjects = [
+		{ id: 0, name: 'Электричество' },
+		{ id: 1, name: 'Газ' },
+		{ id: 3, name: 'Отопление' },
+		{ id: 4, name: 'Канализация' }
 	];
 
 	const furnitureObjects = [
 		{ id: 0, name: 'Вся' },
 		{ id: 1, name: 'Частично' },
 		{ id: 2, name: 'Без мебели' }
-	];
-
-	const redevelopmentObjects = [
-		{ id: 0, name: 'Не было' },
-		{ id: 1, name: 'Незаконная' },
-		{ id: 2, name: 'Узаконенная' }
 	];
 
 	const mortgageObjects = [
@@ -266,7 +247,7 @@ const ApartmentForm = () => {
 
 	return (
 		<div className={"form"}>
-			<h1><u>АНКЕТА КВАРТИРА</u></h1>
+			<h1><u>АНКЕТА ДОМ</u></h1>
 			<SelectOrInput
 				parameterName="Адрес объекта:"
 				name2="address" value2={state.address}
@@ -301,12 +282,18 @@ const ApartmentForm = () => {
 			/>
 			<h2><u>Характеристики объекта:</u></h2>
 			<SelectOrInput
-				parameterName="Тип дома:"
+				parameterName="Вид объекта:"
 				name1="typeOfHouse" value1={state.typeOfHouse} 
-				name2="typeOfHouseText" value2={state.typeOfHouseText}
 				valuesList={typeOfHouseObjects}
 				onChangeFunc={onChange}
 				multiple={false}
+			/>
+			<SelectOrInput
+				parameterName="Материал стен:"
+				name1="wallMaterial" value1={state.wallMaterial} 
+				valuesList={wallMaterialObjects}
+				onChangeFunc={onChange}
+				multiple={true}
 			/>
 			<SelectOrInput
 				parameterName="Класс дома:"
@@ -324,14 +311,6 @@ const ApartmentForm = () => {
 				placeholderText="Введите число"
 			/>
 			<SelectOrInput
-				parameterName="Состояние подъезда:"
-				name1="entranceCondition" value1={state.entranceCondition} 
-				name2="entranceConditionText" value2={state.entranceConditionText}
-				valuesList={entranceConditionObjects}
-				onChangeFunc={onChange}
-				multiple={false}
-			/>
-			<SelectOrInput
 				parameterName="Этажность дома:"
 				name2="floorsCount" value2={state.floorsCount}
 				onChangeFunc={onChange}
@@ -339,95 +318,60 @@ const ApartmentForm = () => {
 				placeholderText="Введите число"
 			/>
 			<SelectOrInput
-				parameterName="Этаж:"
-				name2="floorNumber" value2={state.floorNumber}
-				onChangeFunc={onChange}
-				inputType="number"
-				placeholderText="Введите число"
-			/>
-			<SelectOrInput
-				parameterName="Количество комнат:"
-				name2="roomsCount" value2={state.roomsCount}
-				onChangeFunc={onChange}
-				inputType="number"
-				placeholderText="Введите число"
-			/>
-			<SelectOrInput
-				parameterName="Состояние квартиры:"
-				name1="apartmentCondition" value1={state.apartmentCondition}
-				valuesList={apartmentConditionObjects}
+				parameterName="Состояние дома:"
+				name1="houseCondition" value1={state.houseCondition}
+				valuesList={houseConditionObjects}
 				onChangeFunc={onChange}
 				multiple={false}
 			/>
 			<SelectOrInput
 				parameterName="Ремонт:"
 				name1="repair" value1={state.repair}
-				name2="repairText" value2={state.repairText}
 				valuesList={repairObjects}
 				onChangeFunc={onChange}
 				multiple={false}
 			/>
-			<div className="container">
-				<div className="parameter_name"><b><i>Площадь квартиры (кв.м):</i></b></div>
-				<div className="squares">
-					<div className="squares__item">
-						<div>общая:</div>
-						<input name="squareTotal" type="number" value={state.squareTotal} onChange={onChange} placeholder='Введите число'/>
-					</div>
-					<div className="squares__item">
-						<div>жилая:</div>
-						<input name="squareLiving" type="number" value={state.squareLiving} onChange={onChange} placeholder='Введите число'/>
-					</div>
-					<div className="squares__item">
-						<div>кухня:</div>
-						<input name="squareKitchen" type="number" value={state.squareKitchen} onChange={onChange} placeholder='Введите число'/>
-					</div>
-				</div>
-			</div>
 			<SelectOrInput
-				parameterName="Планировка:"
-				name1="layout" value1={state.layout}
-				name2="layoutText" value2={state.layoutText}
-				valuesList={layoutObjects}
+				parameterName="Площадь дома (кв. м.):"
+				name2="squareHouse" value2={state.squareHouse}
+				onChangeFunc={onChange}
+				inputType="number"
+				placeholderText="Введите число"
+			/>
+			<SelectOrInput
+				parameterName="Площадь участка (кв. м.):"
+				name2="squareArea" value2={state.squareArea}
+				onChangeFunc={onChange}
+				inputType="number"
+				placeholderText="Введите число"
+			/>
+			<SelectOrInput
+				parameterName="Категория замель:"
+				name1="landCategory" value1={state.landCategory}
+				valuesList={landCategoryObjects}
 				onChangeFunc={onChange}
 				multiple={false}
 			/>
 			<SelectOrInput
-				parameterName="Санузел:"
-				name1="bathroom" value1={state.bathroom}
-				valuesList={bathroomObjects}
+				parameterName="Количество спален:"
+				name2="roomsCount" value2={state.roomsCount}
 				onChangeFunc={onChange}
-				multiple={false}
+				inputType="number"
+				placeholderText="Введите число"
 			/>
 			<SelectOrInput
-				parameterName="Количество санузлов:"
+				parameterName="Санузел (кол-во):"
 				name2="bathroomСount" value2={state.bathroomСount}
 				onChangeFunc={onChange}
 				inputType="number"
 				placeholderText="Введите число"
 			/>
 			<SelectOrInput
-				parameterName="На кухне:"
-				name1="kitchen" value1={state.kitchen}
-				name2="kitchenText" value2={state.kitchenText}
-				valuesList={kitchenObjects}
+				parameterName="Коммуникации:"
+				name1="communications" value1={state.communications}
+				valuesList={communicationsObjects}
 				onChangeFunc={onChange}
-				multiple={false}
-			/>
-			<SelectOrInput
-				parameterName="Наличие балкона/лоджии:"
-				name1="hasBalcony" value1={state.hasBalcony}
-				valuesList={hasBalconyObjects}
-				onChangeFunc={onChange}
-				multiple={false}
-			/>
-			<SelectOrInput
-				parameterName="Стеклопакеты:"
-				name1="glassPane" value1={state.glassPane}
-				name2="glassPaneText" value2={state.glassPaneText}
-				valuesList={glassPaneObjects}
-				onChangeFunc={onChange}
-				multiple={false}
+				multiple={true}
 			/>
 			<SelectOrInput
 				parameterName="Мебель, которая останется при продаже:"
@@ -438,12 +382,9 @@ const ApartmentForm = () => {
 				multiple={false}
 			/>
 			<SelectOrInput
-				parameterName="Перепланировка:"
-				name1="redevelopment" value1={state.redevelopment}
-				name2="redevelopmentText" value2={state.redevelopmentText}
-				valuesList={redevelopmentObjects}
+				parameterName="Расстояние до МКАД (для Москвы):"
+				name2="mkadDistance" value2={state.mkadDistance}
 				onChangeFunc={onChange}
-				multiple={false}
 			/>
 			<SelectOrInput
 				parameterName="Нюансы и обременения:"
@@ -484,4 +425,4 @@ const ApartmentForm = () => {
 	);
 };
 
-export default ApartmentForm;
+export default HouseForm;

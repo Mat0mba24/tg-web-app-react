@@ -1,0 +1,59 @@
+.form {
+	display: flex;
+	flex-direction: column;
+	padding: 20px;
+}
+h1, h2 {
+	text-align: center;
+	margin-bottom: 10px;
+}
+.squares {
+	display: flex;
+	flex-direction: column;
+	border-radius: 5px;
+	column-gap: 5px;
+}
+.squares__item {
+	display: flex;
+	flex-direction: column;
+}
+.squares__item input, .squares__item div {
+	font-size: 15px;
+}
+
+/* ======================================== */
+
+.images_container {
+	border: 1px solid #ddd;
+	border-radius: 5px;
+	padding: 10px;
+}
+
+.images_container input[type="file"] {
+	font-size: 15px;
+}
+
+.images_container .image-block {
+    display: flex;
+    align-items: flex-start;
+		flex-direction: column;
+    margin-top: 10px;
+    border: 1px solid #ddd; /* рамка вокруг блока с изображением */
+    padding: 10px; /* отступ внутри блока с изображением */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); /* тень вокруг блока с изображением */
+		row-gap: 5px;
+}
+
+.images_container .image-block img {
+	width: 100px;
+	height: 100px;
+	object-fit: contain;
+}
+
+.images_container .image-block button {
+	background: var(--tg-theme-button-color);
+	color: var(--tg-theme-button-text-color);
+	border: none;
+	cursor: pointer;
+	padding: 5px 10px;
+}
